@@ -46,7 +46,7 @@ RSpec.describe RuboCop::Cop::Style::ZeroLengthPredicate, :config do
       RUBY
     end
 
-    it 'registers an offense for `array&.length&.zero?` with safe navigation operator' do
+    it 'registers an offense for `array&.length&.zero?`' do
       expect_offense(<<~RUBY)
         [1, 2, 3]&.length&.zero?
                    ^^^^^^^^^^^^^ Use `empty?` instead of `length&.zero?`.
@@ -57,7 +57,7 @@ RSpec.describe RuboCop::Cop::Style::ZeroLengthPredicate, :config do
       RUBY
     end
 
-    it 'registers an offense for `array&.size&.zero?` with safe navigation operator' do
+    it 'registers an offense for `array&.size&.zero?`' do
       expect_offense(<<~RUBY)
         [1, 2, 3]&.size&.zero?
                    ^^^^^^^^^^^ Use `empty?` instead of `size&.zero?`.
@@ -65,6 +65,39 @@ RSpec.describe RuboCop::Cop::Style::ZeroLengthPredicate, :config do
 
       expect_correction(<<~RUBY)
         [1, 2, 3]&.empty?
+      RUBY
+    end
+
+    it 'registers an offense for `array&.length.zero?`' do
+      expect_offense(<<~RUBY)
+        [1, 2, 3].length&.zero?
+                  ^^^^^^^^^^^^^ Use `empty?` instead of `length&.zero?`.
+      RUBY
+
+      expect_correction(<<~RUBY)
+        [1, 2, 3]&.empty?
+      RUBY
+    end
+
+    it 'registers an offense for `array&.size.zero?`' do
+      expect_offense(<<~RUBY)
+        [1, 2, 3]&.size.zero?
+                   ^^^^^^^^^^ Use `empty?` instead of `size.zero?`.
+      RUBY
+
+      expect_correction(<<~RUBY)
+        [1, 2, 3]&.empty?
+      RUBY
+    end
+
+    it 'registers an offense for `array.size&.zero?`' do
+      expect_offense(<<~RUBY)
+        [1, 2, 3].size&.zero?
+                  ^^^^^^^^^^^ Use `empty?` instead of `size&.zero?`.
+      RUBY
+
+      expect_correction(<<~RUBY)
+        [1, 2, 3].empty?
       RUBY
     end
 

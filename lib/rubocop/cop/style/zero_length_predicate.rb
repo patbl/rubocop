@@ -102,6 +102,8 @@ module RuboCop
           {
             (send (send _ ${:length :size}) :zero?)
             (csend (csend _ ${:length :size}) :zero?)
+            (send (csend _ ${:length :size}) :zero?)
+            (csend (send _ ${:length :size}) :zero?)
           }
         PATTERN
 
