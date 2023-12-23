@@ -1,4 +1,6 @@
 # frozen_string_literal: true
+require 'debug'
+require 'pry'
 
 module RuboCop
   module Cop
@@ -48,6 +50,8 @@ module RuboCop
           check_nonzero_length_comparison(node)
         end
 
+        alias on_csend on_send
+
         private
 
         def check_zero_length_predicate(node)
@@ -55,7 +59,8 @@ module RuboCop
           return if non_polymorphic_collection?(node.parent)
 
           offense = node.loc.selector.join(node.parent.source_range.end)
-          message = format(ZERO_MSG, current: "#{length_method}.zero?")
+          call_operator = node.csend_type? ? '&.' : '.'
+          message = format(ZERO_MSG, current: "#{length_method}#{call_operator}zero?")
 
           add_offense(offense, message: message) do |corrector|
             corrector.replace(offense, 'empty?')
@@ -94,7 +99,10 @@ module RuboCop
 
         # @!method zero_length_predicate(node)
         def_node_matcher :zero_length_predicate, <<~PATTERN
-          (send (send (...) ${:length :size}) :zero?)
+          {
+            (send (send _ ${:length :size}) :zero?)
+            (csend (csend _ ${:length :size}) :zero?)
+          }
         PATTERN
 
         # @!method zero_length_comparison(node)
